@@ -1,15 +1,3 @@
----
-title             : "Project: English relative clauses"
-shorttitle        : "Project Bayes 1 (WI20-21)"
-author: "George Alkhoury - 805682"
-tags: [nothing, nothingness]
-abstract: |
-  English relative clauses are the most widely studied construction in psycholinguistics, and many theories have been proposed to explain why object relatives are harder to read at the relative clause verb than subject relatives. The data provided are for the critical region (the relative clause verb). The experiment method is self-paced reading, so we have reading times in milliseconds.
-output: 
-    pdf_document:
-        template: NULL
----
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
