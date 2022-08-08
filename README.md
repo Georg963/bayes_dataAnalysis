@@ -1,1 +1,2 @@
-# bayes_dataAnalysis
+# English relative clauses
+English relative clauses are the most widely studied construction in psycholinguistics, and many theories have been proposed to explain why object relatives are harder to read at the relative clause verb than subject relatives. The data provided are for the critical region (the relative clause verb). The experiment method is self-paced reading, so the reading times are given in milliseconds.
