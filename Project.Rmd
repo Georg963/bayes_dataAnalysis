@@ -24,12 +24,6 @@ library(lme4)
 dat <- read.csv("dat_1_.txt","", header = TRUE)
 ```
 
-- First, i read the data into the data frame ***dat***. The data columns are:
-   - subj: subject id
-   - item: item id
-   - condition: condition a (subject relative) or b (object relative)
-   - so: sum coded contrasts for the conditions
-   - rt: reading time at the critical region (the relative clause verb)
 
 First six rows of the data-set are shown below
 ```{r, echo=FALSE}
@@ -45,76 +39,6 @@ summary(m)
 ```
 #### defining a hierarchical linear model with varying intercepts and varying slopes for subject and item, assuming a correlation between the varying intercepts and slopes for both subject and item, and a gaussian likelihood.
 
-
-- Likelihood:
-
-$rt_n \sim Normal(\alpha + u_{subj[n],1} + w_{item[n],1} + so_n * (\beta + u_{subj[n],2} + w_{item[n],2}), \sigma)$
-
-- Priors:
-
-$\alpha \sim Normal(0, 1000)$
-
-$beta \sim Normal(0, 1000)$
-
-$sigma \sim Normal_+(0, 500)$
-
-\[
-   \left( {\begin{array}{cc}
-   u_{i,1}\\
-   u_{i,2} \\
-  \end{array} } \right)
-   \sim
-  N\left( {\begin{array}{cc}
-   \left( {\begin{array}{cc}
-   0\\
-   0\\
-  \end{array} } \right), \Sigma_u
-  \end{array} } \right)
-\]
-\[
-   \left( {\begin{array}{cc}
-   w_{i,1}\\
-   w_{i,2} \\
-  \end{array} } \right)
-   \sim
-  N\left( {\begin{array}{cc}
-   \left( {\begin{array}{cc}
-   0\\
-   0\\
-  \end{array} } \right), \Sigma_w
-  \end{array} } \right)
-\]
-
-Where
-
-\[
-   \Sigma_u=
-  \left( {\begin{array}{cc}
-   \tau_{u_1}^2 & \rho_u\tau_{u_1}\tau_{u_2} \\
-   \rho_u\tau_{u_1}\tau_{u_2} & \tau_{u_2}^2 \\
-  \end{array} } \right)
-\]
-\[
-   \Sigma_w=
-  \left( {\begin{array}{cc}
-   \tau_{w_1}^2 & \rho_w\tau_{w_1}\tau_{w_2} \\
-   \rho_w\tau_{w_1}\tau_{w_2} & \tau_{w_2}^2 \\
-  \end{array} } \right)
-\]
-
-$\tau_{u_1} \sim Normal_+(0, 500)$
-
-$\tau_{u_2} \sim Normal_+(0, 500)$
-
-$\rho_u \sim LKJcorr(2)$
-
-$\tau_{w_1} \sim Normal_+(0, 500)$
-
-$\tau_{w_2} \sim Normal_+(0, 500)$
-
-$\rho_w \sim LKJcorr(2)$
-
-- In order to simplify the call to brms i will assign the same priors to the by-subject and by-item parameters
 
 ```{r, message=FALSE, warning=FALSE, results='hide'}
 m_hier_gaussian_brm<-brm(rt~so+(so|subj)+(so|item),
@@ -167,12 +91,9 @@ print(p)
 }
 ```
 
-- for different conditions we got the solid line showing us what the data look like and the blue lines are the predicted data from the model. this gives us an idea how badly the model deviates from the observed data. As we see in the two figures above the posterior predicted data are not similar to the real data, *we may not have less than zero milliseconds reading time*.
-
 
 #### defining a hierarchical linear model with varying intercepts and varying slopes for subject and item, assuming a correlation between the varying intercepts and slopes for both subject and item, and a lognormal likelihood.
 
-- First we do prior predictive check to see whether our priors make sense
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
 df_spacebar_ref <- dat %>%
@@ -197,77 +118,6 @@ median(x - lag(x), na.rm = TRUE)
 }
 pp_check(fit_prior_press_trial, type = "stat", stat = "median_effect")
 ```
-
-- Likelihood:
-
-$rt_n \sim lognormal(\alpha + u_{subj[n],1} + w_{item[n],1} + so_n * (\beta + u_{subj[n],2} + w_{item[n],2}), \sigma)$
-
-- Priors:
-
-$\alpha \sim Normal(6, 3)$
-
-$beta \sim Normal(0, 0.1)$
-
-$sigma \sim Normal_+(0, 1)$
-
-\[
-   \left( {\begin{array}{cc}
-   u_{i,1}\\
-   u_{i,2} \\
-  \end{array} } \right)
-   \sim
-  N\left( {\begin{array}{cc}
-   \left( {\begin{array}{cc}
-   0\\
-   0\\
-  \end{array} } \right), \Sigma_u
-  \end{array} } \right)
-\]
-\[
-   \left( {\begin{array}{cc}
-   w_{i,1}\\
-   w_{i,2} \\
-  \end{array} } \right)
-   \sim
-  N\left( {\begin{array}{cc}
-   \left( {\begin{array}{cc}
-   0\\
-   0\\
-  \end{array} } \right), \Sigma_w
-  \end{array} } \right)
-\]
-
-Where
-
-\[
-   \Sigma_u=
-  \left( {\begin{array}{cc}
-   \tau_{u_1}^2 & \rho_u\tau_{u_1}\tau_{u_2} \\
-   \rho_u\tau_{u_1}\tau_{u_2} & \tau_{u_2}^2 \\
-  \end{array} } \right)
-\]
-\[
-   \Sigma_w=
-  \left[ {\begin{array}{cc}
-   \tau_{w_1}^2 & \rho_w\tau_{w_1}\tau_{w_2} \\
-   \rho_w\tau_{w_1}\tau_{w_2} & \tau_{w_2}^2 \\
-  \end{array} } \right]
-\]
-
-$\tau_{u_1} \sim Normal_+(0, 1)$
-
-$\tau_{u_2} \sim Normal_+(0, 1)$
-
-$p_u \sim LKJcorr(2)$
-
-$\tau_{w_1} \sim Normal_+(0, 1)$
-
-$\tau_{w_2} \sim Normal_+(0, 1)$
-
-$\rho_w \sim LKJcorr(2)$
-
-- In order to simplify the call to brms i will assign the same priors to the by-subject and by-item parameters
-- i fit the model with 4000 iterations rather than with the default of 2000 iterations by chain. The reason is that when I run the model with the default number of iterations, I get the following warning: *Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and media Running the chains for more iterations may help. See http://mc-stan.org/misc/warnings.html#bulk-ess.*
 
 
 ```{r, message=FALSE, warning=FALSE, results='hide'}
@@ -317,61 +167,3 @@ ggtitle(paste("so: ",l))
 print(p)
 }
 ```
-
-- As we see in the two figures above the posterior predicted data are more similar to the real data, compared to the case where we had a Normal likelihood
-
-
-# Conclusion
-
-1. the gaussian model (m_hier_gaussian_brm)
-
-Likelihood: $rt_n \sim Normal(\alpha + u_{subj[n],1} + w_{item[n],1} + so_n * (\beta + u_{subj[n],2} + w_{item[n],2}), \sigma)$
-
-rt = 409.93 + 151.66 + 31.46 + ($\pm$ 0.5)*(78.93+99.24+29.28) + 162.97
-
-condition $\rightarrow$ subject relative: -0.5
-
-rt = 593.05 + (-0.5)*(207,45) + 162.97 = 593.05 - 103,725 + 162.97 = 652,295 milliseconds
-
-condition $\rightarrow$ object relative: +0.5
-
-rt = 593.05 + (+0.5)*(207,45) + 162.97 = 593.05 + 103,725 + 162.97 = 859,745 milliseconds
-
-$\Longrightarrow$ the condition affects the reading time. subject relative is faster than object relative. Object relatives are harder to read at
-the relative clause verb than subject relatives
-
-2. the lognormal model (m_hier_log_brm)
-
-Likelihood: $rt_n \sim lognormal(\alpha + u_{subj[n],1} + w_{item[n],1} + so_n * (\beta + u_{subj[n],2} + w_{item[n],2}), \sigma)$
-
-rt = 5.87 + 0.37 + 0.07 + ($\pm$ 0.5)*(0.117 + 0.22 + 0.07) + 0.37
-
-condition $\rightarrow$ subject relative: -0.5
-
-rt = 6.31 - 0.215 + 0.37 = 6.465 on the log milliseconds scale. exp(6.465) = 642.2644 milliseconds
-
-condition $\rightarrow$ object relative: +0.5
-
-rt = 6.31 + 0.215 + 0.37 = 6.895 on the log milliseconds scale. exp(6.895) = 987.3257 milliseconds
-
-$\Longrightarrow$ the condition affects the reading time. subject relative is faster than object relative. object relatives are harder to read at
-the relative clause verb than subject relatives
-
-# correlation parameters:
-
-Modeling the correlation between varying intercepts and slopes means defining a covariance relationship between by-subject varying intercepts and slopes, and between by-items varying intercepts and slopes. This amounts to adding an assumption that the by-subject slopes $u_{i,2}$ could in principle have some correlation with the by-subject intercepts $u_{i,1}$; and by-item slopes $w_{i,2}$ with by-item intercept $w_{i,1}$.
-
-1. the gaussian model (m_hier_gaussian_brm)
-
-- the correlation $\rho_u$ between by-subject varying intercepts and slopes is positive (0.82). that means the faster a subject’s reading time is on average, the faster they read object relatives.
-- the correlation $\rho_w$ between by-item varying intercepts and slopes is also positive (0.02). that means the faster a item’s reading time is on average, the faster they read object relatives.
-
-2. the lognormal model (m_hier_log_brm)
-
-- the correlation $\rho_u$ between by-subject varying intercepts and slopes is negative (0.65). that means the faster a subject’s reading time is on average, the faster they read object relatives.
-- the correlation $\rho_w$ between by-item varying intercepts and slopes is also positive (-0.14). that means the slower a item’s reading time is on average, the slower they read object relatives.
-
-
-\newpage
-# References
-***An Introduction to Bayesian Data Analysis for Cognitive Science, Bruno Nicenboim, Daniel Schad, and Shravan Vasishth***
